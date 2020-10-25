@@ -1,11 +1,14 @@
 import pandas as pd
 
-def load_data(file):
-    strategic_raw_data = pd.read_excel(file, header=0, dtpe=object)
-    qgis_table = pd.read_excel(file, sheet_name=1, header=0, usecols=["AssANode","AssBNode", "ID"], index_col=None)
-    return strategic_raw_data, qgis_table
+def load_data(strategic_data_file, qgis_data_file=None):
+    strategic_raw_data = pd.read_excel(strategic_data_file, header=0, dtpe=object)
+    if qgis_data_file:
+        qgis_table = pd.read_excel(qgis_data_file, sheet_name=1, header=0, usecols=["AssANode","AssBNode", "ID"], index_col=None)
+    if strategic_data_file and qgis_data_file:
+        return strategic_raw_data, qgis_table
+    return strategic_raw_data
 
-def extract_routes(strategic_raw_data, qgis_table, ogv=None):
+def select_data(strategic_raw_data, qgis_table, ogv=None):
     # Obtain the relevant user class data, filter the unique route information
     ogv_index=min(strategic_raw_data[strategic_raw_data["UC"] == 9].index)
     if ogv:
@@ -20,6 +23,9 @@ def extract_routes(strategic_raw_data, qgis_table, ogv=None):
     nodes = strategic_data.to_string(header=False, index=False).split()
     nodes=list(filter(lambda x: "NaN" not in x, nodes))
 
+    return nodes
+
+def group_nodes(nodes):
     # create a nested list containing lists of nodes that make up each route. Use "route" string as separator.
     # Handle the extra characters
     nodes_grouped, count = [], -1 # todo change from -1
@@ -33,6 +39,9 @@ def extract_routes(strategic_raw_data, qgis_table, ogv=None):
         else:
             nodes_grouped[count].append(float(nodes[i]))
 
+    return nodes_grouped
+
+def group_links(nodes_grouped):
     # Adjust the final element in each list that have been formatted as % in excel
     for count, node_group in enumerate(nodes_grouped):
         if len(str(node_group[-1])) < len(str(node_group[0])): # Think of a more robust way, perhaps average the lengths of all but the last
@@ -40,26 +49,27 @@ def extract_routes(strategic_raw_data, qgis_table, ogv=None):
         nodes_grouped[count] = list(map(int,node_group))
 
     # In the same nested list format, populate with the node to node combinations that make up the links
-    nodes_joined=[]
+    links=[]
     for i in range(len(nodes_grouped)):
-        nodes_joined.append([])
+        links.append([])
         for j in range(len(nodes_grouped[i])-1):
-            nodes_joined[i].append(f"{nodes_grouped[i][j]}>{nodes_grouped[i][j+1]}")
+            links[i].append(f"{nodes_grouped[i][j]}>{nodes_grouped[i][j+1]}")
 
+    return links
+
+def obtain_routes(links, qgis_table):
     # Extract the ID for each node to node combination, representing a link.
-
     # Obtain the link numbers for each node to node combination. Each list is a route composed of links.
     routes=[]
-    for i in range(len(nodes_joined)):
+    for i in range(len(links)):
         routes.append([])
-        for link in nodes_joined[i]:
+        for link in links[i]:
             link_index = (qgis_table.index[qgis_table["AssBNode"] == link].tolist()[0])
             routes[i].append(qgis_table.at[link_index, "ID"])
 
     return routes
 
-def export_results(results):
+def export_results(results, save_name):
     # Export results as csv
-    #Fix the save name issue
     routes_df = pd.DataFrame(results)
-    routes_df.to_csv('uc1-8__unique_routes.csv', index=False, header=False)
+    routes_df.to_csv(f'{save_name}.csv', index=False, header=False)
