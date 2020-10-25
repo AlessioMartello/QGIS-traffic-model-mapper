@@ -8,7 +8,7 @@ def load_data(strategic_data_file, qgis_data_file=None):
         return strategic_raw_data, qgis_table
     return strategic_raw_data
 
-def select_data(strategic_raw_data, qgis_table, ogv=None):
+def select_route_data(strategic_raw_data, ogv=None):
     # Obtain the relevant user class data, filter the unique route information
     ogv_index=min(strategic_raw_data[strategic_raw_data["UC"] == 9].index)
     if ogv:
@@ -17,10 +17,22 @@ def select_data(strategic_raw_data, qgis_table, ogv=None):
         strategic_data=strategic_raw_data[:ogv_index]
 
     strategic_data=strategic_data[strategic_data.iloc[:,0] == "route"]
-    strategic_data.drop_duplicates(keep="first", inplace=True)
+    # strategic_data.drop_duplicates(keep="first", inplace=True)
 
     # Create a list with all the nodes
     nodes = strategic_data.to_string(header=False, index=False).split()
+    nodes=list(filter(lambda x: "NaN" not in x, nodes))
+
+    return nodes
+
+def select_volume_data(strategic_raw_data):
+    # Obtain the relevant user class data, filter the unique route information
+    # ogv_index=min(strategic_raw_data[strategic_raw_data["UC"] == 9].index)
+    volume_data=strategic_raw_data[strategic_raw_data.iloc[:,0] != "route"]["Flow"]
+    # strategic_data.drop_duplicates(keep="first", inplace=True)
+
+    # # Create a list with all the nodes
+    nodes = volume_data.to_string(header=False, index=False).split()
     nodes=list(filter(lambda x: "NaN" not in x, nodes))
 
     return nodes
