@@ -54,7 +54,7 @@ def group_nodes(nodes):
     return nodes_grouped
 
 def group_links(nodes_grouped):
-    # Adjust the final element in each list that have been formatted as % in excel
+    # Adjust the final element in each uple that have been formatted as % in excel
     for count, node_group in enumerate(nodes_grouped):
         if len(str(node_group[-1])) < len(str(node_group[0])): # Think of a more robust way, perhaps average the lengths of all but the last
             node_group[-1] = node_group[-1]*100
@@ -85,3 +85,17 @@ def export_results(results, save_name):
     # Export results as csv
     routes_df = pd.DataFrame(results)
     routes_df.to_csv(f'{save_name}.csv', index=False, header=False)
+
+def routes_volume_join(routes, volumes):
+    lst=[]
+    res ={}
+    for i,route, volume in zip(range(len(routes)), routes, volumes):
+        res={}
+        res["Route"] = route
+        lst.append(res)
+    return lst
+
+def drop_duplicates(lst):
+    unique_routes=[]
+    unique_routes = [list(i.values())[0] for i in lst if list(i.values())[0] not in unique_routes]
+    return unique_routes
