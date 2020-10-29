@@ -2,46 +2,39 @@ import pandas as pd
 import json
 from constants import LINK_INPUT, LINK_OUTPUT
 
-def load_data(strategic_data_file, qgis_data_file=None):
+
+def load_data(strategic_data_file, qgis_data_file):
+    """ Reads Excel data into Pandas DataFrames"""
     strategic_raw_data = pd.read_excel(strategic_data_file, header=0, dtpe=object)
-    if qgis_data_file:
-        qgis_table = pd.read_excel(qgis_data_file, sheet_name=1, header=0, usecols=["AssANode","AssBNode", "ID"], index_col=None)
-    if strategic_data_file and qgis_data_file:
-        return strategic_raw_data, qgis_table
-    return strategic_raw_data
+    qgis_table = pd.read_excel(qgis_data_file, sheet_name=1, header=0, usecols=["AssANode","AssBNode", "ID"], index_col=None)
+    return strategic_raw_data, qgis_table
 
 def select_route_data(strategic_raw_data, ogv=None):
-    # Obtain the relevant user class data, filter the unique route information
+    """Obtain the relevant user class nodes"""
     ogv_index=min(strategic_raw_data[strategic_raw_data["UC"] == 9].index)
     if ogv:
         strategic_data=strategic_raw_data[ogv_index:]
     else:
         strategic_data=strategic_raw_data[:ogv_index]
-
     strategic_data=strategic_data[strategic_data.iloc[:,0] == "route"]
-    # strategic_data.drop_duplicates(keep="first", inplace=True)
 
     # Create a list with all the nodes
     nodes = strategic_data.to_string(header=False, index=False).split()
     nodes=list(filter(lambda x: "NaN" not in x, nodes))
-
     return nodes
 
 def select_volume_data(strategic_raw_data):
-    # Obtain the relevant user class data, filter the unique route information
-    # ogv_index=min(strategic_raw_data[strategic_raw_data["UC"] == 9].index)
+    """Obtain the relevant user class traffic flow data"""
     volume_data=strategic_raw_data[strategic_raw_data.iloc[:,0] != "route"]["Flow"]
-    # strategic_data.drop_duplicates(keep="first", inplace=True)
 
-    # # Create a list with all the nodes
+    # Create a list with all the volumes
     nodes = volume_data.to_string(header=False, index=False).split()
     nodes=list(filter(lambda x: "NaN" not in x, nodes))
-
     return nodes
 
 def group_nodes(nodes):
-    # create a nested list containing lists of nodes that make up each route. Use "route" string as separator.
-    # Handle the extra characters
+    """Create a nested list containing lists of nodes that make up each route. Use "route" string as separator."""
+    
     nodes_grouped, count = [], -1 # todo change from -1
     for i in range(len(nodes)):
         if nodes[i] == "route":
@@ -49,10 +42,9 @@ def group_nodes(nodes):
             count+=1
             continue
         if "+" in nodes[i]:
-            nodes_grouped[count].append(float(nodes[i].replace("+","")))
+            nodes_grouped[count].append(float(nodes[i].replace("+",""))) # Handle the extra characters
         else:
             nodes_grouped[count].append(float(nodes[i]))
-
     return nodes_grouped
 
 def group_links(nodes_grouped):
@@ -68,7 +60,6 @@ def group_links(nodes_grouped):
         links.append([])
         for j in range(len(nodes_grouped[i])-1):
             links[i].append(f"{nodes_grouped[i][j]}>{nodes_grouped[i][j+1]}")
-
     return links
 
 def obtain_routes(links, qgis_table):
@@ -80,15 +71,10 @@ def obtain_routes(links, qgis_table):
         for link in links[i]:
             link_index = (qgis_table.index[qgis_table["AssBNode"] == link].tolist()[0])
             routes[i].append(qgis_table.at[link_index, "ID"])
-
     return routes
 
-# def export_results(results, save_name):
-#     # Export results as csv
-#     routes_df = pd.DataFrame(results)
-#     routes_df.to_csv(f'{save_name}.csv', index=False, header=False)
-
 def routes_volume_join(routes, volumes):
+    """ Join the Routes for every user class to the respective traffic volumes"""
     lst=[]
     res ={}
     for i,route, volume in zip(range(len(routes)), routes, volumes):
@@ -98,11 +84,13 @@ def routes_volume_join(routes, volumes):
     return lst
 
 def drop_duplicates(lst):
+    """Remove any duplicate routes"""
     unique_routes=[]
     unique_routes = [list(i.values())[0] for i in lst if list(i.values())[0] not in unique_routes]
     return unique_routes
 
 def qgis_json_format(unique_routes, LINK_INPUT=LINK_INPUT, LINK_OUTPUT=LINK_OUTPUT):
+    """Format the sequence of links to be a list of dictionaries accepted by qgis"""
     qgis_route_list = []
     route={}
     for i in range(len(unique_routes)):
