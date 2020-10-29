@@ -1,4 +1,6 @@
 import pandas as pd
+import json
+from constants import LINK_INPUT, LINK_OUTPUT
 
 def load_data(strategic_data_file, qgis_data_file=None):
     strategic_raw_data = pd.read_excel(strategic_data_file, header=0, dtpe=object)
@@ -81,10 +83,10 @@ def obtain_routes(links, qgis_table):
 
     return routes
 
-def export_results(results, save_name):
-    # Export results as csv
-    routes_df = pd.DataFrame(results)
-    routes_df.to_csv(f'{save_name}.csv', index=False, header=False)
+# def export_results(results, save_name):
+#     # Export results as csv
+#     routes_df = pd.DataFrame(results)
+#     routes_df.to_csv(f'{save_name}.csv', index=False, header=False)
 
 def routes_volume_join(routes, volumes):
     lst=[]
@@ -99,3 +101,22 @@ def drop_duplicates(lst):
     unique_routes=[]
     unique_routes = [list(i.values())[0] for i in lst if list(i.values())[0] not in unique_routes]
     return unique_routes
+
+def qgis_json_format(unique_routes, LINK_INPUT=LINK_INPUT, LINK_OUTPUT=LINK_OUTPUT):
+    qgis_route_list = []
+    route={}
+    for i in range(len(unique_routes)):
+        route["PARAMETERS"] ={}
+        route_expression = "' \\\"NO\\\"  = " + " or \\\"NO\\\"  = ".join(list(map(str,unique_routes[i]))) + "\\n'"
+        route["PARAMETERS"]["INPUT"] = LINK_INPUT
+        route["PARAMETERS"]["EXPRESSION"] = route_expression
+        route["OUTPUTS"] = {}
+        route["OUTPUTS"]["OUTPUT"] = LINK_OUTPUT
+        route["OUTPUTS"]["FAIL_OUTPUT"] = LINK_OUTPUT
+        qgis_route_list.append(route)
+    return qgis_route_list
+
+def export_to_json(filename, data):
+    file = f"{filename}.json"
+    with open(file, "w") as f:
+        json.dump(data, f)
