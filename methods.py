@@ -92,8 +92,8 @@ def drop_duplicates(lst):
 def qgis_json_format(unique_routes, LINK_INPUT=LINK_INPUT, LINK_OUTPUT=LINK_OUTPUT):
     """Format the sequence of links to be a list of dictionaries accepted by qgis"""
     qgis_route_list = []
-    route={}
     for i in range(len(unique_routes)):
+        route={}
         route["PARAMETERS"] ={}
         route_expression = "' \\\"NO\\\"  = " + " or \\\"NO\\\"  = ".join(list(map(str,unique_routes[i]))) + "\\n'"
         route["PARAMETERS"]["INPUT"] = LINK_INPUT
@@ -102,6 +102,7 @@ def qgis_json_format(unique_routes, LINK_INPUT=LINK_INPUT, LINK_OUTPUT=LINK_OUTP
         route["OUTPUTS"]["OUTPUT"] = LINK_OUTPUT
         route["OUTPUTS"]["FAIL_OUTPUT"] = LINK_OUTPUT
         qgis_route_list.append(route)
+        print(route["PARAMETERS"]["EXPRESSION"])
     return qgis_route_list
 
 def export_to_json(filename, data):
