@@ -1,6 +1,6 @@
 import pandas as pd
 import json
-from constants import LINK_INPUT, LINK_OUTPUT
+from constants import LINK_INPUT, LINK_OUTPUT, FAIL_OUTPUT
 
 
 def load_data(strategic_data_file, qgis_data_file):
@@ -89,20 +89,26 @@ def drop_duplicates(lst):
     unique_routes = [list(i.values())[0] for i in lst if list(i.values())[0] not in unique_routes]
     return unique_routes
 
-def qgis_json_format(unique_routes, LINK_INPUT=LINK_INPUT, LINK_OUTPUT=LINK_OUTPUT):
+def qgis_json_format(unique_routes, ogv=None, LINK_INPUT=LINK_INPUT, LINK_OUTPUT=LINK_OUTPUT, FAIL_OUTPUT=FAIL_OUTPUT):
     """Format the sequence of links to be a list of dictionaries accepted by qgis"""
+    def define_outputs():
+        if not ogv:
+            route_output = f"{LINK_OUTPUT}/{i}_1.gpkg"
+            route_fail_output = f"{FAIL_OUTPUT}/{i}_1.gpkg"
+        else:
+            route_output = f"{LINK_OUTPUT}/{i}_2.gpkg"
+            route_fail_output = f"{FAIL_OUTPUT}/{i}_2.gpkg"
+        return route_output, route_fail_output
+
     qgis_route_list = []
     for i in range(len(unique_routes)):
         route={}
         route["PARAMETERS"] ={}
-        route_expression = "' \\\"NO\\\"  = " + " or \\\"NO\\\"  = ".join(list(map(str,unique_routes[i]))) + "\\n'"
         route["PARAMETERS"]["INPUT"] = LINK_INPUT
-        route["PARAMETERS"]["EXPRESSION"] = route_expression
+        route["PARAMETERS"]["EXPRESSION"] = "' \\\"NO\\\"  = " + " or \\\"NO\\\"  = ".join(list(map(str,unique_routes[i]))) + "\\n'"
         route["OUTPUTS"] = {}
-        route["OUTPUTS"]["OUTPUT"] = LINK_OUTPUT
-        route["OUTPUTS"]["FAIL_OUTPUT"] = LINK_OUTPUT
+        route["OUTPUTS"]["OUTPUT"], route["OUTPUTS"]["FAIL_OUTPUT"] = define_outputs()
         qgis_route_list.append(route)
-        print(route["PARAMETERS"]["EXPRESSION"])
     return qgis_route_list
 
 def export_to_json(filename, data):
