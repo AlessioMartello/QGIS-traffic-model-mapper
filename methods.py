@@ -6,7 +6,7 @@ from constants import LINK_INPUT, LINK_OUTPUT, FAIL_OUTPUT
 def load_data(strategic_data_file, qgis_data_file):
     """ Reads Excel data into Pandas DataFrames"""
     strategic_raw_data = pd.read_excel(strategic_data_file, header=0, dtpe=object)
-    qgis_table = pd.read_excel(qgis_data_file, sheet_name=1, header=0, usecols=["AssANode","AssBNode", "ID"], index_col=None)
+    qgis_table = pd.read_excel(qgis_data_file, header=0, usecols=["AssANode","AssBNode", "ID"], index_col=None)
     return strategic_raw_data, qgis_table
 
 def select_route_data(strategic_raw_data, ogv=None):
@@ -75,8 +75,7 @@ def obtain_routes(links, qgis_table):
 
 def routes_volume_join(routes, volumes):
     """ Join the Routes for every user class to the respective traffic volumes"""
-    lst=[]
-    res ={}
+    lst, res =[],{}
     for i,route, volume in zip(range(len(routes)), routes, volumes):
         res={}
         res["Route"] = route
@@ -89,15 +88,15 @@ def drop_duplicates(lst):
     unique_routes = [list(i.values())[0] for i in lst if list(i.values())[0] not in unique_routes]
     return unique_routes
 
-def qgis_json_format(unique_routes, ogv=None, LINK_INPUT=LINK_INPUT, LINK_OUTPUT=LINK_OUTPUT, FAIL_OUTPUT=FAIL_OUTPUT):
+def qgis_json_format(unique_routes, ogv=None, LINK_INPUT=LINK_INPUT):
     """Format the sequence of links to be a list of dictionaries accepted by qgis"""
-    def define_outputs():
+    def define_outputs(LINK_OUTPUT=LINK_OUTPUT, FAIL_OUTPUT=FAIL_OUTPUT):
         if not ogv:
-            route_output = f"{LINK_OUTPUT}/{i}_1.gpkg"
-            route_fail_output = f"{FAIL_OUTPUT}/{i}_1.gpkg"
+            route_output = f"{LINK_OUTPUT}/{unique_routes[i][0]}_{i}_1.gpkg"
+            route_fail_output = f"{FAIL_OUTPUT}/{unique_routes[i][0]}_{i}_1.gpkg"
         else:
-            route_output = f"{LINK_OUTPUT}/{i}_2.gpkg"
-            route_fail_output = f"{FAIL_OUTPUT}/{i}_2.gpkg"
+            route_output = f"{LINK_OUTPUT}/{unique_routes[i][0]}_{i}_2.gpkg"
+            route_fail_output = f"{FAIL_OUTPUT}/{unique_routes[i][0]}_{i}_2.gpkg"
         return route_output, route_fail_output
 
     qgis_route_list = []
@@ -105,7 +104,7 @@ def qgis_json_format(unique_routes, ogv=None, LINK_INPUT=LINK_INPUT, LINK_OUTPUT
         route={}
         route["PARAMETERS"] ={}
         route["PARAMETERS"]["INPUT"] = LINK_INPUT
-        route["PARAMETERS"]["EXPRESSION"] = "' \\\"NO\\\"  = " + " or \\\"NO\\\"  = ".join(list(map(str,unique_routes[i]))) + "\\n'"
+        route["PARAMETERS"]["EXPRESSION"] = "' \\\"ID\\\"  = " + " or \\\"ID\\\"  = ".join(list(map(str,unique_routes[i]))) + "\\n'"
         route["OUTPUTS"] = {}
         route["OUTPUTS"]["OUTPUT"], route["OUTPUTS"]["FAIL_OUTPUT"] = define_outputs()
         qgis_route_list.append(route)
