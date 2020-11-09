@@ -1,6 +1,7 @@
 import pandas as pd
 import json
 from constants import LINK_INPUT, LINK_OUTPUT, FAIL_OUTPUT
+import pathlib
 
 
 def load_data(strategic_data_file, qgis_data_file):
@@ -9,28 +10,27 @@ def load_data(strategic_data_file, qgis_data_file):
     qgis_table = pd.read_excel(qgis_data_file, header=0, usecols=["AssANode","AssBNode", "ID"], index_col=None)
     return strategic_raw_data, qgis_table
 
+
 def select_route_data(strategic_raw_data, ogv=None):
     """Obtain the relevant user class nodes"""
     ogv_index=min(strategic_raw_data[strategic_raw_data["UC"] == 9].index)
     if ogv:
         strategic_data=strategic_raw_data[ogv_index:]
+        volume_data=strategic_data[strategic_data.iloc[:,0] != "route"]["Flow"]
     else:
         strategic_data=strategic_raw_data[:ogv_index]
-    strategic_data=strategic_data[strategic_data.iloc[:,0] == "route"]
+        volume_data=strategic_data[strategic_data.iloc[:,0] != "route"]["Flow"]
 
+    strategic_data=strategic_data[strategic_data.iloc[:,0] == "route"]
+    return volume_data, strategic_data
+
+
+def to_list(strategic_data):
     # Create a list with all the nodes
     nodes = strategic_data.to_string(header=False, index=False).split()
     nodes=list(filter(lambda x: "NaN" not in x, nodes))
     return nodes
 
-def select_volume_data(strategic_raw_data):
-    """Obtain the relevant user class traffic flow data"""
-    volume_data=strategic_raw_data[strategic_raw_data.iloc[:,0] != "route"]["Flow"]
-
-    # Create a list with all the volumes
-    nodes = volume_data.to_string(header=False, index=False).split()
-    nodes=list(filter(lambda x: "NaN" not in x, nodes))
-    return nodes
 
 def group_nodes(nodes):
     """Create a nested list containing lists of nodes that make up each route. Use "route" string as separator."""
@@ -47,6 +47,7 @@ def group_nodes(nodes):
             nodes_grouped[count].append(float(nodes[i]))
     return nodes_grouped
 
+
 def group_links(nodes_grouped):
     # Adjust the final element in each uple that have been formatted as % in excel
     for count, node_group in enumerate(nodes_grouped):
@@ -62,6 +63,7 @@ def group_links(nodes_grouped):
             links[i].append(f"{nodes_grouped[i][j]}>{nodes_grouped[i][j+1]}")
     return links
 
+
 def obtain_routes(links, qgis_table):
     # Extract the ID for each node to node combination, representing a link.
     # Obtain the link numbers for each node to node combination. Each list is a route composed of links.
@@ -73,10 +75,10 @@ def obtain_routes(links, qgis_table):
             routes[i].append(qgis_table.at[link_index, "ID"])
     return routes
 
-def routes_volume_join(routes, volumes):
+def routes_volume_join(routes):
     """ Join the Routes for every user class to the respective traffic volumes"""
     lst, res =[],{}
-    for i,route, volume in zip(range(len(routes)), routes, volumes):
+    for i,route in zip(range(len(routes)), routes):
         res={}
         res["Route"] = route
         lst.append(res)
@@ -99,7 +101,7 @@ def qgis_json_format(unique_routes, ogv=None, LINK_INPUT=LINK_INPUT):
             route_fail_output = f"{FAIL_OUTPUT}/{unique_routes[i][0]}_{i}_2.gpkg"
         return route_output, route_fail_output
 
-    qgis_route_list = []
+    qgis_route_list, route_ids = [], []
     for i in range(len(unique_routes)):
         route={}
         route["PARAMETERS"] ={}
@@ -107,10 +109,27 @@ def qgis_json_format(unique_routes, ogv=None, LINK_INPUT=LINK_INPUT):
         route["PARAMETERS"]["EXPRESSION"] = "' \\\"ID\\\"  = " + " or \\\"ID\\\"  = ".join(list(map(str,unique_routes[i]))) + "\\n'"
         route["OUTPUTS"] = {}
         route["OUTPUTS"]["OUTPUT"], route["OUTPUTS"]["FAIL_OUTPUT"] = define_outputs()
+        route_ids.append(define_outputs()[0])
         qgis_route_list.append(route)
-    return qgis_route_list
+    return qgis_route_list, route_ids
 
 def export_to_json(filename, data):
     file = f"{filename}.json"
     with open(file, "w") as f:
         json.dump(data, f)
+
+def df_writer(save_name):
+    """
+    Function returns full file path and name of the save location.
+
+    Parameters:
+        project_name (str): The returned string from get_project_name()
+        analysis (str): The analysis type being performed; it is used to inform the filename.
+        data_directory: The directory path gathered from the ask dialogue in gui.py
+
+    Returns:
+        writer: a Pandas Excel writer object containing the file path of the project and where to save.
+    """
+    writer = pd.ExcelWriter(pathlib.Path(f"{save_name}_volumes.xlsx"))
+    #writer = pathlib.Path(data_directory).joinpath(save_filename)
+    writer.save()
