@@ -16,10 +16,10 @@ def select_route_data(strategic_raw_data, ogv=None):
     ogv_index=min(strategic_raw_data[strategic_raw_data["UC"] == 9].index)
     if ogv:
         strategic_data=strategic_raw_data[ogv_index:]
-        volume_data=strategic_data[strategic_data.iloc[:,0] != "route"]["Flow"]
+        volume_data=strategic_data[strategic_data.iloc[:,0] != "route"]["Flow"].drop_duplicates().dropna()
     else:
         strategic_data=strategic_raw_data[:ogv_index]
-        volume_data=strategic_data[strategic_data.iloc[:,0] != "route"]["Flow"]
+        volume_data=strategic_data[strategic_data.iloc[:,0] != "route"]["Flow"].drop_duplicates().dropna()
 
     strategic_data=strategic_data[strategic_data.iloc[:,0] == "route"]
     return volume_data, strategic_data
@@ -75,7 +75,7 @@ def obtain_routes(links, qgis_table):
             routes[i].append(qgis_table.at[link_index, "ID"])
     return routes
 
-def routes_volume_join(routes):
+def routes_to_dict(routes):
     """ Join the Routes for every user class to the respective traffic volumes"""
     lst, res =[],{}
     for i,route in zip(range(len(routes)), routes):
@@ -118,18 +118,13 @@ def export_to_json(filename, data):
     with open(file, "w") as f:
         json.dump(data, f)
 
-def df_writer(save_name):
-    """
-    Function returns full file path and name of the save location.
+def create_volume_table(route_codes,  unique_routes_list, all_volumes = []):
+    for route_code, links, volumes, names in zip(route_codes, unique_routes_list, all_volumes, ["Volumes", "OGV_Volumes"]):
+        route_codes_id_df = pd.DataFrame(route_code).reset_index(drop=True)
+        route_codes_id_df.columns = [f"Origin_Route-ID_UC"]
+        links_df = pd.DataFrame(links).reset_index(drop=True)
+        volumes_df = pd.DataFrame(volumes).reset_index(drop=True)
+        volumes_df.columns = [f"Volume"]
+        volume_results= pd.concat([route_codes_id_df, links_df, volumes_df], axis=1)
+        volume_results.to_excel(f"{names}.xlsx", index=False)
 
-    Parameters:
-        project_name (str): The returned string from get_project_name()
-        analysis (str): The analysis type being performed; it is used to inform the filename.
-        data_directory: The directory path gathered from the ask dialogue in gui.py
-
-    Returns:
-        writer: a Pandas Excel writer object containing the file path of the project and where to save.
-    """
-    writer = pd.ExcelWriter(pathlib.Path(f"{save_name}_volumes.xlsx"))
-    #writer = pathlib.Path(data_directory).joinpath(save_filename)
-    writer.save()
