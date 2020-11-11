@@ -20,7 +20,6 @@ def select_route_data(strategic_raw_data, ogv=None):
     else:
         strategic_data=strategic_raw_data[:ogv_index]
         volume_data=strategic_data[strategic_data.iloc[:,0] != "route"]["Flow"].dropna()
-        print(len(volume_data))
 
     strategic_data=strategic_data[strategic_data.iloc[:,0] == "route"]
     return volume_data, strategic_data
@@ -76,20 +75,6 @@ def obtain_routes(links, qgis_table):
             routes[i].append(qgis_table.at[link_index, "ID"])
     return routes
 
-def routes_to_dict(routes):
-    """ Join the Routes for every user class to the respective traffic volumes"""
-    lst, res =[],{}
-    for i,route in zip(range(len(routes)), routes):
-        res={}
-        res["Route"] = route
-        lst.append(res)
-    return lst
-
-def drop_duplicates(lst):
-    """Remove any duplicate routes"""
-    unique_routes=[]
-    unique_routes = [list(i.values())[0] for i in lst if list(i.values())[0] not in unique_routes]
-    return unique_routes
 
 def qgis_json_format(unique_routes, ogv=None, LINK_INPUT=LINK_INPUT):
     """Format the sequence of links to be a list of dictionaries accepted by qgis"""
