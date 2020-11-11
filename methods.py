@@ -7,7 +7,7 @@ import pathlib
 def load_data(strategic_data_file, qgis_data_file):
     """ Reads Excel data into Pandas DataFrames"""
     strategic_raw_data = pd.read_excel(strategic_data_file, header=0, dtpe=object)
-    qgis_table = pd.read_excel(qgis_data_file, header=0, usecols=["AssANode","AssBNode", "ID"], index_col=None)
+    qgis_table = pd.read_excel(qgis_data_file, header=0, usecols=["AssBNode", "ID"], index_col=None)
     return strategic_raw_data, qgis_table
 
 
@@ -16,10 +16,11 @@ def select_route_data(strategic_raw_data, ogv=None):
     ogv_index=min(strategic_raw_data[strategic_raw_data["UC"] == 9].index)
     if ogv:
         strategic_data=strategic_raw_data[ogv_index:]
-        volume_data=strategic_data[strategic_data.iloc[:,0] != "route"]["Flow"].drop_duplicates().dropna()
+        volume_data=strategic_data[strategic_data.iloc[:,0] != "route"]["Flow"].dropna()
     else:
         strategic_data=strategic_raw_data[:ogv_index]
-        volume_data=strategic_data[strategic_data.iloc[:,0] != "route"]["Flow"].drop_duplicates().dropna()
+        volume_data=strategic_data[strategic_data.iloc[:,0] != "route"]["Flow"].dropna()
+        print(len(volume_data))
 
     strategic_data=strategic_data[strategic_data.iloc[:,0] == "route"]
     return volume_data, strategic_data
