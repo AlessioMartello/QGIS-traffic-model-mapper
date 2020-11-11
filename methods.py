@@ -2,9 +2,9 @@
 
 import pandas as pd
 import json
-from constants import LINK_INPUT, LINK_OUTPUT, FAIL_OUTPUT
 import pathlib
 
+from constants import LINK_INPUT, LINK_OUTPUT, FAIL_OUTPUT
 
 def load_data(strategic_data_file, qgis_data_file):
     """ Reads Excel data into Pandas DataFrames"""
