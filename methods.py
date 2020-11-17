@@ -18,10 +18,10 @@ def select_route_data(strategic_raw_data, ogv=None):
     ogv_index=min(strategic_raw_data[strategic_raw_data["UC"] == 9].index)
     if ogv:
         strategic_data=strategic_raw_data[ogv_index:]
-        volume_data=strategic_data[strategic_data.iloc[:,0] != "route"]["Flow"].dropna()
+        volume_data=strategic_data[strategic_data.iloc[:,0] != "route"]["Flow"].dropna().round(decimals=2)
     else:
         strategic_data=strategic_raw_data[:ogv_index]
-        volume_data=strategic_data[strategic_data.iloc[:,0] != "route"]["Flow"].dropna()
+        volume_data=strategic_data[strategic_data.iloc[:,0] != "route"]["Flow"].dropna().round(decimals=2)
 
     strategic_data=strategic_data[strategic_data.iloc[:,0] == "route"]
     return volume_data, strategic_data
