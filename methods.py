@@ -78,15 +78,15 @@ def obtain_routes(links, qgis_table):
     return routes
 
 
-def qgis_json_format(unique_routes, ogv=None, LINK_INPUT=LINK_INPUT):
+def qgis_json_format(unique_routes, volumes, ogv=None,  LINK_INPUT=LINK_INPUT):
     """Format the sequence of links to be a list of dictionaries accepted by qgis"""
     def define_outputs(LINK_OUTPUT=LINK_OUTPUT, FAIL_OUTPUT=FAIL_OUTPUT):
         if not ogv:
-            route_output = f"{LINK_OUTPUT}/{unique_routes[i][0]}_{i}_1.gpkg"
-            route_fail_output = f"{FAIL_OUTPUT}/{unique_routes[i][0]}_{i}_1.gpkg"
+            route_output = f"{LINK_OUTPUT}/{unique_routes[i][0]}_{i}_1_{volumes[i]}.gpkg"
+            route_fail_output = f"{FAIL_OUTPUT}/{unique_routes[i][0]}_{i}_1_{volumes[i]}.gpkg"
         else:
-            route_output = f"{LINK_OUTPUT}/{unique_routes[i][0]}_{i}_2.gpkg"
-            route_fail_output = f"{FAIL_OUTPUT}/{unique_routes[i][0]}_{i}_2.gpkg"
+            route_output = f"{LINK_OUTPUT}/{unique_routes[i][0]}_{i}_2_{volumes[i]}.gpkg"
+            route_fail_output = f"{FAIL_OUTPUT}/{unique_routes[i][0]}_{i}_2_{volumes[i]}.gpkg"
         return route_output, route_fail_output
 
     qgis_route_list, route_ids = [], []
@@ -108,9 +108,7 @@ def export_to_json(filename, data):
 
 def create_volume_table(route_codes,  unique_routes_list, all_volumes = []):
     for route_code, links, volumes, names in zip(route_codes, unique_routes_list, all_volumes, ["Volumes", "OGV_Volumes"]):
-        volume_list = volumes.tolist()
-        routeys = [f"{route}_{volume}" for route, volume  in zip(route_code, volumes)]
-        route_codes_id_df = pd.DataFrame(routeys).reset_index(drop=True)
+        route_codes_id_df = pd.DataFrame(route_code).reset_index(drop=True)
         route_codes_id_df.columns = [f"Origin_Route-ID_UC_Volume"]
         links_df = pd.DataFrame(links).reset_index(drop=True)
         volumes_df = pd.DataFrame(volumes).reset_index(drop=True)
