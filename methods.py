@@ -108,8 +108,10 @@ def export_to_json(filename, data):
 
 def create_volume_table(route_codes,  unique_routes_list, all_volumes = []):
     for route_code, links, volumes, names in zip(route_codes, unique_routes_list, all_volumes, ["Volumes", "OGV_Volumes"]):
-        route_codes_id_df = pd.DataFrame(route_code).reset_index(drop=True)
-        route_codes_id_df.columns = [f"Origin_Route-ID_UC"]
+        volume_list = volumes.tolist()
+        routeys = [f"{route}_{volume}" for route, volume  in zip(route_code, volumes)]
+        route_codes_id_df = pd.DataFrame(routeys).reset_index(drop=True)
+        route_codes_id_df.columns = [f"Origin_Route-ID_UC_Volume"]
         links_df = pd.DataFrame(links).reset_index(drop=True)
         volumes_df = pd.DataFrame(volumes).reset_index(drop=True)
         volumes_df.columns = [f"Volume"]
