@@ -1,0 +1,3 @@
+LINK_INPUT= "'B:/Projects/7215 Enfield Town Liveable Neighbourhood/Technical/Modelling/HAM Model Outputs/2021 Future Base/AM/AM_2021FB_model_cordon_outputs/AM/Shapefiles/UserLinks/UserLinks.SHX'"
+LINK_OUTPUT= "B:/Projects/7215 Enfield Town Liveable Neighbourhood/Technical/Modelling/HAM Model Outputs/2021 Future Base/AM/AM_2021FB_model_cordon_outputs/AM/GPKG"
+FAIL_OUTPUT = "B:/Projects/7215 Enfield Town Liveable Neighbourhood/Technical/Modelling/HAM Model Outputs/2021 Future Base/AM/AM_2021FB_model_cordon_outputs/AM/Error"
