@@ -2,7 +2,6 @@
 
 import pandas as pd
 import json
-import pathlib
 
 from constants import LINK_INPUT, LINK_OUTPUT, FAIL_OUTPUT
 
