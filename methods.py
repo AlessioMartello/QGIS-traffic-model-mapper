@@ -78,6 +78,14 @@ def obtain_routes(links, qgis_table):
             routes[i].append(qgis_table.at[link_index, "ID"])
     return routes
 
+def unique_routes(routes, volume):
+    """returns DataFrame containing unique routes and the total volume of each route"""
+    volume = volume.tolist()
+    routes_df = pd.DataFrame(pd.Series(list(map(str,routes))), columns=["Routes"])
+    routes_df["Volumes"] = pd.Series(volume, index=routes_df.index)
+    routes_df = routes_df.groupby("Routes", as_index=False).sum().round(decimals=2)
+    return routes_df
+
 
 def qgis_json_format(routes_df=pd.DataFrame([]), ogv=None, LINK_INPUT=LINK_INPUT):
     """Format the sequence of links to be a list of dictionaries accepted by qgis"""
@@ -113,13 +121,21 @@ def export_to_json(filename, data):
         json.dump(data, f)
 
 
-def create_volume_table(route_codes, unique_routes_df, all_volumes):
-    for route_code, links, volumes, names in zip(route_codes, unique_routes_df, all_volumes,
+def prepare_excel_results(route_codes, all_routes_list, all_volumes, unique_routes_df, route_ids):
+    def append(named_list, data):
+        named_list.append(data)
+
+    append(all_routes_list, unique_routes_df["Routes"])  # List of all routes, before dropping duplicates, used for volume results
+    append(all_volumes, unique_routes_df["Volumes"])
+    append(route_codes,[route_ids[i].split("/")[-1].strip(".gpkg") for i in range(len(route_ids))])
+
+
+def create_volume_table(route_codes, unique_routes_list, all_volumes):
+    for route_code, links, volumes, names in zip(route_codes, unique_routes_list, all_volumes,
                                                  ["Volumes", "OGV_Volumes"]):
         route_codes_id_df = pd.DataFrame(route_code).reset_index(drop=True)
         route_codes_id_df.columns = [f"Origin_Route-ID_UC_Volume"]
         links_df = links.reset_index(drop=True)
         volumes_df = volumes.reset_index(drop=True)
-        volumes_df.columns = [f"Volume"]
         volume_results = pd.concat([route_codes_id_df, links_df, volumes_df], axis=1)
         volume_results.to_excel(f"{names}.xlsx", index=False)

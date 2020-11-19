@@ -15,23 +15,16 @@ volume_data_sets = {"volumes": volumes, "ogv_volumes": ogv_volumes}
 route_codes, all_routes_list, all_volumes = [], [], []
 for (user_class, data), (volume) in zip(data_sets.items(), volume_data_sets.values()):
     # Block executes code for JSON file to be imported into QGIS
-    volume = volume.tolist()
     nodes = methods.to_list(data)
     nodes_grouped = methods.group_nodes(nodes)  # Group the node sequences that make up a route
     links = methods.group_links(nodes_grouped)  # From the node sequences create the links
     routes = methods.obtain_routes(links, qgis_table)  # For the links create the list of links that make up each route
-
-    routes_df = pd.DataFrame(pd.Series(list(map(str,routes))), columns=["Routes"])
-    routes_df["Volumes"] = pd.Series(volume, index=routes_df.index)
-    routes_df = routes_df.groupby("Routes", as_index=False).sum().round(decimals=2)
-
-    qgis_routes, route_ids = methods.qgis_json_format(routes_df) if user_class != "ogv_routes" else methods.qgis_json_format(routes_df, ogv=True)  # Format results
+    unique_routes_df = methods.unique_routes(routes, volume) # Group duplicate routes and sum the volumes
+    qgis_routes, route_ids = methods.qgis_json_format(unique_routes_df) if user_class != "ogv_routes" else methods.qgis_json_format(unique_routes_df, ogv=True)  # Format results
     methods.export_to_json(user_class, qgis_routes)  # Export json files
 
     # Block executes code for the Excel table of results
-    all_routes_list.append(routes_df["Routes"])  # List of all routes, before dropping duplicates, used for volume results
-    all_volumes.append(routes_df["Volumes"])
-    route_codes.append([route_ids[i].split("/")[-1].strip(".gpkg") for i in range(len(route_ids))])
+    methods.prepare_excel_results(route_codes, all_routes_list, all_volumes, unique_routes_df, route_ids)
 
 methods.create_volume_table(route_codes, all_routes_list,
                             all_volumes=all_volumes)  # Create a table of routes and volumes and export it
