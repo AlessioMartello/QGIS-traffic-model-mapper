@@ -1,5 +1,4 @@
 import pathlib
-import pandas as pd
 import methods
 
 strategic_data_file = pathlib.Path.cwd() / "Enfield Saturn Routes AM test.xlsx"
