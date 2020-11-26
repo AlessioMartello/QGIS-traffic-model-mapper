@@ -1,9 +1,9 @@
 import pathlib
 import methods
 
-def run_analysis():
-    strategic_data_file = pathlib.Path.cwd() / "Enfield Saturn Routes AM test.xlsx"
-    qgis_file = pathlib.Path.cwd() / "qgis_data.xlsx"
+def run_analysis(strategic_data_file, qgis_file):
+    # strategic_data_file = pathlib.Path(strategic_data_file)
+    # qgis_file = pathlib.Path(qgis_file)
     strategic_raw_data, qgis_table = methods.load_data(strategic_data_file, qgis_file)  # Load raw data
 
     volumes, nodes = methods.select_route_data(strategic_raw_data)
