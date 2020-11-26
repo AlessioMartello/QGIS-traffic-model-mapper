@@ -51,7 +51,7 @@ def group_nodes(nodes):
 
 
 def group_links(nodes_grouped):
-    # Adjust the final element in each uple that have been formatted as % in excel
+    # Adjust the final element in each tuple that have been formatted as % in excel
     for count, node_group in enumerate(nodes_grouped):
         if len(str(node_group[-1])) < len(
                 str(node_group[0])):  # Think of a more robust way, perhaps average the lengths of all but the last
@@ -78,10 +78,11 @@ def obtain_routes(links, qgis_table):
             routes[i].append(qgis_table.at[link_index, "ID"])
     return routes
 
+
 def unique_routes(routes, volume):
     """returns DataFrame containing unique routes and the total volume of each route"""
     volume = volume.tolist()
-    routes_df = pd.DataFrame(pd.Series(list(map(str,routes))), columns=["Routes"])
+    routes_df = pd.DataFrame(pd.Series(list(map(str, routes))), columns=["Routes"])
     routes_df["Volumes"] = pd.Series(volume, index=routes_df.index)
     routes_df = routes_df.groupby("Routes", as_index=False).sum().round(decimals=2)
     return routes_df
@@ -125,9 +126,10 @@ def prepare_excel_results(route_codes, all_routes_list, all_volumes, unique_rout
     def append(named_list, data):
         named_list.append(data)
 
-    append(all_routes_list, unique_routes_df["Routes"])  # List of all routes, before dropping duplicates, used for volume results
+    append(all_routes_list,
+           unique_routes_df["Routes"])  # List of all routes, before dropping duplicates, used for volume results
     append(all_volumes, unique_routes_df["Volumes"])
-    append(route_codes,[route_ids[i].split("/")[-1].strip(".gpkg") for i in range(len(route_ids))])
+    append(route_codes, [route_ids[i].split("/")[-1].strip(".gpkg") for i in range(len(route_ids))])
 
 
 def create_volume_table(route_codes, unique_routes_list, all_volumes):
