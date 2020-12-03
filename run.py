@@ -1,4 +1,3 @@
-import pathlib
 import methods
 
 def run_analysis(strategic_data_file, qgis_file):
