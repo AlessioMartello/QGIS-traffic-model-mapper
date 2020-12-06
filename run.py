@@ -1,7 +1,7 @@
 import methods
 
-def run_analysis(strategic_data_file, qgis_file):
 
+def run_analysis(strategic_data_file, qgis_file, link_input, link_output, fail_output):
     strategic_raw_data, qgis_table = methods.load_data(strategic_data_file, qgis_file)  # Load raw data
 
     volumes, nodes = methods.select_route_data(strategic_raw_data)
@@ -16,9 +16,12 @@ def run_analysis(strategic_data_file, qgis_file):
         nodes = methods.to_list(data)
         nodes_grouped = methods.group_nodes(nodes)  # Group the node sequences that make up a route
         links = methods.group_links(nodes_grouped)  # From the node sequences create the links
-        routes = methods.obtain_routes(links, qgis_table)  # For the links create the list of links that make up each route
-        unique_routes_df = methods.unique_routes(routes, volume) # Group duplicate routes and sum the volumes
-        qgis_routes, route_ids = methods.qgis_json_format(unique_routes_df) if user_class != "ogv_routes" else methods.qgis_json_format(unique_routes_df, ogv=True)  # Format results
+        routes = methods.obtain_routes(links,
+                                       qgis_table)  # For the links create the list of links that make up each route
+        unique_routes_df = methods.unique_routes(routes, volume)  # Group duplicate routes and sum the volumes
+        qgis_routes, route_ids = methods.qgis_json_format(link_input, link_output, fail_output,
+            unique_routes_df) if user_class != "ogv_routes" else methods.qgis_json_format(link_input, link_output, fail_output, unique_routes_df,
+                                                                                          ogv=True)  # Format results
         methods.export_to_json(user_class, qgis_routes)  # Export json files
 
         # Block executes code for the Excel table of results
