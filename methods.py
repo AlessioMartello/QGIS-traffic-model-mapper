@@ -3,8 +3,6 @@
 import pandas as pd
 import json
 
-from constants import LINK_INPUT, LINK_OUTPUT, FAIL_OUTPUT
-
 
 def load_data(strategic_data_file, qgis_data_file):
     """ Reads Excel data into Pandas DataFrames"""
@@ -88,8 +86,9 @@ def unique_routes(routes, volume):
     return routes_df
 
 
-def qgis_json_format(routes_df=pd.DataFrame([]), ogv=None, LINK_INPUT=LINK_INPUT):
+def qgis_json_format(LINK_INPUT, LINK_OUTPUT, FAIL_OUTPUT, routes_df=pd.DataFrame([]), ogv=None,):
     """Format the sequence of links to be a list of dictionaries accepted by qgis"""
+    print(LINK_OUTPUT, LINK_INPUT, FAIL_OUTPUT)
     unique_routes = [i.strip("[]").split(",") for i in routes_df["Routes"]]
     volumes = list(routes_df["Volumes"])
 
