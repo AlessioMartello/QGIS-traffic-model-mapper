@@ -2,6 +2,7 @@
 
 import pandas as pd
 import json
+import pathlib
 
 
 def load_data(strategic_data_file, qgis_data_file):
@@ -115,7 +116,7 @@ def qgis_json_format(LINK_INPUT, LINK_OUTPUT, FAIL_OUTPUT, routes_df=pd.DataFram
 
 
 def export_to_json(filename, data):
-    file = f"{filename}.json"
+    file = f"{pathlib.Path.cwd()}/outputs/{filename}.json"
     with open(file, "w") as f:
         json.dump(data, f)
 
@@ -138,4 +139,4 @@ def create_volume_table(route_codes, unique_routes_list, all_volumes):
         links_df = links.reset_index(drop=True)
         volumes_df = volumes.reset_index(drop=True)
         volume_results = pd.concat([route_codes_id_df, links_df, volumes_df], axis=1)
-        volume_results.to_excel(f"{names}.xlsx", index=False)
+        volume_results.to_excel(f"{pathlib.Path.cwd()}/outputs/{names}.xlsx", index=False)
