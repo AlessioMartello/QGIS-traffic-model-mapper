@@ -1,4 +1,4 @@
-import methods
+from saturn_routes import methods
 
 
 def run_analysis(strategic_data_file, qgis_file, link_input, link_output, fail_output):
@@ -20,8 +20,8 @@ def run_analysis(strategic_data_file, qgis_file, link_input, link_output, fail_o
                                        qgis_table)  # For the links create the list of links that make up each route
         unique_routes_df = methods.unique_routes(routes, volume)  # Group duplicate routes and sum the volumes
         qgis_routes, route_ids = methods.qgis_json_format(link_input, link_output, fail_output,
-            unique_routes_df) if user_class != "ogv_routes" else methods.qgis_json_format(link_input, link_output, fail_output, unique_routes_df,
-                                                                                          ogv=True)  # Format results
+                                                          unique_routes_df) if user_class != "ogv_routes" else methods.qgis_json_format(link_input, link_output, fail_output, unique_routes_df,
+                                                                                                                                        ogv=True)  # Format results
         methods.export_to_json(user_class, qgis_routes)  # Export json files
 
         # Block executes code for the Excel table of results

@@ -88,7 +88,6 @@ def unique_routes(routes, volume):
 
 def qgis_json_format(LINK_INPUT, LINK_OUTPUT, FAIL_OUTPUT, routes_df=pd.DataFrame([]), ogv=None,):
     """Format the sequence of links to be a list of dictionaries accepted by qgis"""
-    print(LINK_OUTPUT, LINK_INPUT, FAIL_OUTPUT)
     unique_routes = [i.strip("[]").split(",") for i in routes_df["Routes"]]
     volumes = list(routes_df["Volumes"])
 

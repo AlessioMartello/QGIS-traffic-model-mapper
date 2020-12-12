@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter.filedialog import askopenfilename
 from tkinter import messagebox, filedialog
 
-from run import run_analysis
+from saturn_routes.run import run_analysis
 import pathlib
 
 root = tk.Tk()
