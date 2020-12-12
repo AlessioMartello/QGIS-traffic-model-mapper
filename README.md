@@ -25,7 +25,7 @@ To be used in conjunction with [QGIS](https://www.qgis.org/en/site/)
 * Execute file in Spyder or install requirements and run from any IDE.
 
 #### GUI
-* Select the desired strategic data  and GIS data (both in Excel format)by selecting the respective buttons.
+* Select the desired strategic data  and GIS data (both in Excel format) by selecting the respective buttons.
 * Create and locate the appropriate folders for the .SHX files to be output.
 * Click run.
 * Results will be output into the same folder.
