@@ -15,13 +15,13 @@ class RouteMapper:
 
     def __init__(self, main):
         myFrame = tk.Frame(main)
-        myFrame.pack()
+        myFrame.grid()
 
         self.data_files, self.directories = [None, None], [None, None, None]
         self.error_message = None
 
         self.intro = tk.Label(main, text="Select the files containing the strategic data, GIS data and then click run:",
-                              fg=FOREGROUND_COLOUR, font=("", 15, "bold"), padx=20, pady=10).pack()
+                              fg=FOREGROUND_COLOUR, font=("", 15, "bold")).grid(row=0, columnspan=2, padx=10,pady=10)
 
         self.strategic_data = tk.Button(main, text="Choose strategic data file", command=lambda: self.choose_data(0),
                                         bg=BACKGROUND_COLOUR,
@@ -41,12 +41,12 @@ class RouteMapper:
         self.run_button = tk.Button(main, text="Run", command=self.run_analysis, bg=BACKGROUND_COLOUR,
                                 fg=FOREGROUND_COLOUR, highlightcolor=FOREGROUND_COLOUR, font=("", 15))
 
-        self.strategic_data.pack(pady=20)
-        self.gis_data.pack(pady=20)
-        self.link_input_btn.pack(pady=20)
-        self.link_output_btn.pack(pady=20)
-        self.link_fail_btn.pack(pady=20)
-        self.run_button.pack(pady=20)
+        self.strategic_data.grid(row= 1, column=0, pady=10, rowspan=2)
+        self.gis_data.grid(row= 2, column=0, pady=10, rowspan=2)
+        self.link_input_btn.grid(row=1, column=1, pady=10)
+        self.link_output_btn.grid(row=2, column=1, pady=10)
+        self.link_fail_btn.grid(row=3,column=1, pady=10)
+        self.run_button.grid(row=4, pady=10, columnspan=2)
 
     def choose_data(self, index):
         self.data_files[index] = pathlib.Path(
