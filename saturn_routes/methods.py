@@ -5,33 +5,40 @@ import json
 import pathlib
 
 
-def load_data(strategic_data_file, qgis_data_file):
+def load_data(strategic_data_file):
     """ Reads Excel data into Pandas DataFrames"""
-    strategic_raw_data = pd.read_excel(strategic_data_file, header=0, dtpe=object)
-    qgis_table = pd.read_excel(qgis_data_file, header=0, usecols=["AssBNode", "ID"], index_col=None)
-    return strategic_raw_data, qgis_table
+    strategic_raw_data = pd.read_excel(strategic_data_file, header=0, sheet_name="AM_C_VisumPaths")
+    return strategic_raw_data
 
 
 def select_route_data(strategic_raw_data, ogv=None):
     """Obtain the relevant user class nodes"""
     ogv_index = min(strategic_raw_data[strategic_raw_data["UC"] == 9].index)
-    if ogv:
-        strategic_data = strategic_raw_data[ogv_index:]
-        volume_data = strategic_data[strategic_data.iloc[:, 0] != "route"]["Flow"].dropna().round(decimals=2)
-    else:
-        strategic_data = strategic_raw_data[:ogv_index]
-        volume_data = strategic_data[strategic_data.iloc[:, 0] != "route"]["Flow"].dropna().round(decimals=2)
+
+    strategic_data = strategic_raw_data[:ogv_index]
+    volume_data = strategic_data[strategic_data.iloc[:, 0] != "route"]["Flow"].dropna().round(decimals=2)
 
     strategic_data = strategic_data[strategic_data.iloc[:, 0] == "route"]
-    return volume_data, strategic_data
+    return strategic_data
 
+def df_to_list(df):
+    lst = df.to_string(header=False, index=False).split()
+    return lst
 
-def to_list(strategic_data):
-    # Create a list with all the nodes
-    nodes = strategic_data.to_string(header=False, index=False).split()
-    nodes = list(filter(lambda x: "NaN" not in x, nodes))
-    return nodes
+def get_unique_codes(codes):
+    # Create a list with unique code identifiers
+    unique_codes = list(set(["_".join(codes[i:i+3]) for i in range(0, len(codes), 3)]))
+    return unique_codes
 
+def get_routes(links):
+    nested_routes, nest_count =[], -1
+    for i in range(len(links)):
+        if links[i] == 'NaN':
+            nested_routes.append([])
+            nest_count +=1
+            continue
+        nested_routes[nest_count].append(links[i])
+    return nested_routes
 
 def group_nodes(nodes):
     """Create a nested list containing lists of nodes that make up each route. Use "route" string as separator."""

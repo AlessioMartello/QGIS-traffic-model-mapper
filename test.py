@@ -23,8 +23,8 @@ class TestLoadData(unittest.TestCase):
      def test_strategic_data(self):
          assert_frame_equal(self.test_strategic_data.iloc[0:4, 0:5], self.expected_strategic_data)
 
-    # def test_gis_data(self):
-    #      assert_frame_equal(test_qgis_data[0:4], expected_qgis_data)
+    def test_gis_data(self):
+         assert_frame_equal(test_qgis_data[0:4], expected_qgis_data)
 
 
 
