@@ -15,6 +15,7 @@ def run_analysis():
     unique_codes = methods.get_unique_codes(codes)
 
     routes = methods.get_routes(links)
-
-    print(routes,"\n", unique_codes)
+    print(unique_codes, "\n", routes)
+    x= methods.qgis_json_format("link_input", "link_output", "fail_output", unique_codes, routes)
+    methods.export_to_json("test", x)
 run_analysis()
