@@ -17,8 +17,8 @@ class RouteMapper:
         myFrame = tk.Frame(main)
         myFrame.grid()
 
-        self.data_files, self.directories = [None, None], [None, None, None]
-        self.error_message = None
+        self.data_files, self.directories = [None], [None, None, None]
+        self.error_message, self.complete_message = None, None
 
         self.intro = tk.Label(main, text="Select the files containing the strategic data, GIS data and then click run:",
                               fg=FOREGROUND_COLOUR, font=("", 15, "bold")).grid(row=0, columnspan=2, padx=10,pady=10)
@@ -26,9 +26,6 @@ class RouteMapper:
         self.strategic_data = tk.Button(main, text="Choose strategic data file", command=lambda: self.choose_data(0),
                                         bg=BACKGROUND_COLOUR,
                                         fg=FOREGROUND_COLOUR, highlightcolor=FOREGROUND_COLOUR, font=("", 15))
-        self.gis_data = tk.Button(main, text="Choose GIS data file", command=lambda: self.choose_data(1),
-                                  bg=BACKGROUND_COLOUR,
-                                  fg=FOREGROUND_COLOUR, highlightcolor=FOREGROUND_COLOUR, font=("", 15))
         self.link_input_btn = tk.Button(main, text="Select link input folder", command=lambda: self.choose_directory(0),
                                   bg=BACKGROUND_COLOUR,
                                   fg=FOREGROUND_COLOUR, highlightcolor=FOREGROUND_COLOUR, font=("", 15))
@@ -42,7 +39,6 @@ class RouteMapper:
                                 fg=FOREGROUND_COLOUR, highlightcolor=FOREGROUND_COLOUR, font=("", 15))
 
         self.strategic_data.grid(row= 1, column=0, pady=10, rowspan=2)
-        self.gis_data.grid(row= 2, column=0, pady=10, rowspan=2)
         self.link_input_btn.grid(row=1, column=1, pady=10)
         self.link_output_btn.grid(row=2, column=1, pady=10)
         self.link_fail_btn.grid(row=3,column=1, pady=10)
@@ -68,6 +64,7 @@ class RouteMapper:
     def run_analysis(self):
         try:
             run_analysis(*self.data_files, *self.directories)
+            self.complete_message = messagebox.showinfo("Success", "Analysis complete.")
         except ValueError:
             self.error_message = messagebox.showerror("Error", "Ensure you have selected the appropriate strategic data & GIS data.")
 
