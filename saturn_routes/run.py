@@ -1,4 +1,4 @@
-import methods
+from saturn_routes import methods
 
 
 def run_analysis(strategic_data_file, link_input, link_output, fail_output):
@@ -16,5 +16,5 @@ def run_analysis(strategic_data_file, link_input, link_output, fail_output):
         methods.export_to_json(sheet, formatted_results)
 
 
-run_analysis("C:/Users/Alessio/programming/Python/Visum_routes/HLN_FB_AM_Cordon_routing_info.xlsx", "test", "test",
-             "test")
+# run_analysis("C:/Users/Alessio/programming/Python/Visum_routes/HLN_FB_AM_Cordon_routing_info.xlsx", "test", "test",
+#              "test")
