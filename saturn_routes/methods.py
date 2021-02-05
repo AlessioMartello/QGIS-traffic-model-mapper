@@ -45,7 +45,7 @@ def qgis_json_format(LINK_INPUT, LINK_OUTPUT, FAIL_OUTPUT, unique_codes, routes)
             continue
         route = {}
         route["PARAMETERS"] = {}
-        route["PARAMETERS"]["INPUT"] = LINK_INPUT
+        route["PARAMETERS"]["INPUT"] = f"'{LINK_INPUT}'"
         route["PARAMETERS"]["EXPRESSION"] = "' \\\"ID\\\"  = " + " or \\\"ID\\\"  = ".join(
             list(map(str, routes[i]))) + "\\n'"
         route["OUTPUTS"] = {}

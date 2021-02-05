@@ -17,7 +17,7 @@ class RouteMapper:
         myFrame = tk.Frame(main)
         myFrame.grid()
         self.rounding_state = tk.BooleanVar()
-        self.data_files, self.directories = [None], [None, None, None]
+        self.data_files, self.directories = [None, None], [None, None]
         self.error_message, self.complete_message = None, None
 
         self.intro = tk.Label(main, text="Select the files containing the strategic data, GIS data and then click run:",
@@ -26,13 +26,13 @@ class RouteMapper:
         self.strategic_data = tk.Button(main, text="Choose strategic data file", command=lambda: self.choose_data(0),
                                         bg=BACKGROUND_COLOUR,
                                         fg=FOREGROUND_COLOUR, highlightcolor=FOREGROUND_COLOUR, font=("", 15))
-        self.link_input_btn = tk.Button(main, text="Select link input folder", command=lambda: self.choose_directory(0),
+        self.link_input_btn = tk.Button(main, text="Select link input file (.SHX)", command=lambda: self.choose_data(1),
                                   bg=BACKGROUND_COLOUR,
                                   fg=FOREGROUND_COLOUR, highlightcolor=FOREGROUND_COLOUR, font=("", 15))
-        self.link_output_btn = tk.Button(main, text="Select link output folder", command=lambda: self.choose_directory(1),
+        self.link_output_btn = tk.Button(main, text="Select link output folder", command=lambda: self.choose_directory(0),
                                   bg=BACKGROUND_COLOUR,
                                   fg=FOREGROUND_COLOUR, highlightcolor=FOREGROUND_COLOUR, font=("", 15))
-        self.link_fail_btn = tk.Button(main, text="Select link fail folder", command=lambda: self.choose_directory(2),
+        self.link_fail_btn = tk.Button(main, text="Select link fail folder", command=lambda: self.choose_directory(1),
                                   bg=BACKGROUND_COLOUR,
                                   fg=FOREGROUND_COLOUR, highlightcolor=FOREGROUND_COLOUR, font=("", 15))
         self.run_button = tk.Button(main, text="Run", command=self.run_analysis, bg=BACKGROUND_COLOUR,
@@ -48,17 +48,15 @@ class RouteMapper:
 
     def choose_data(self, index):
         self.data_files[index] = pathlib.Path(
-            askopenfilename(title="Choose the strategic data file", filetypes=[("Excel files", ".xls .xlsx")]))
+            askopenfilename(title="Choose the data file", filetypes=[("Excel files", ".xls .xlsx")]))
         if index == 0:
             self.strategic_data.config(fg="green")
         else:
-            self.gis_data.config(fg="green")
+            self.link_input_btn.config(fg="green")
 
     def choose_directory(self, index):
         self.directories[index] = filedialog.askdirectory()
         if index == 0:
-            self.link_input_btn.config(fg="green")
-        elif index == 1:
             self.link_output_btn.config(fg="green")
         else:
             self.link_fail_btn.config(fg="green")
