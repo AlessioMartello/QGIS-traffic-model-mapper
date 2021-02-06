@@ -48,7 +48,7 @@ class RouteMapper:
 
     def choose_data(self, index):
         self.data_files[index] = pathlib.Path(
-            askopenfilename(title="Choose the data file", filetypes=[("Excel files", ".xls .xlsx")]))
+            askopenfilename(title="Choose the data file", filetypes=[("", ".SHX .xls .xlsx")]))
         if index == 0:
             self.strategic_data.config(fg="green")
         else:
@@ -71,7 +71,6 @@ class RouteMapper:
             self.complete_message = messagebox.showinfo("Success", "Analysis complete.")
         except ValueError:
             self.error_message = messagebox.showerror("Error", "Ensure you have selected the appropriate strategic data & GIS data.")
-
 
 a = RouteMapper(root)
 

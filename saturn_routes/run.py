@@ -15,7 +15,7 @@ def run_analysis(strategic_data_file, link_input, link_output, fail_output, roun
         else:
             volumes = methods.df_to_list(volume_data["VOL(AP)"])
         unique_volume_codes = [f"{i}_{j}" for i, j in zip(unique_codes, volumes)]
-        formatted_results = methods.qgis_json_format(link_input, link_output, fail_output, unique_volume_codes, routes)
+        formatted_results = methods.qgis_json_format(str(link_input), link_output, fail_output, unique_volume_codes, routes)
         methods.export_to_json(sheet, formatted_results)
 
 

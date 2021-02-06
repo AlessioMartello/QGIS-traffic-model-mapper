@@ -32,6 +32,7 @@ def get_routes(links):
     return nested_routes
 
 def qgis_json_format(LINK_INPUT, LINK_OUTPUT, FAIL_OUTPUT, unique_codes, routes):
+
     """Format the sequence of links to be a list of dictionaries accepted by qgis"""
 
     def define_filename(LINK_OUTPUT=LINK_OUTPUT, FAIL_OUTPUT=FAIL_OUTPUT):
