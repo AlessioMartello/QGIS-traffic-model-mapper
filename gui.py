@@ -47,8 +47,7 @@ class RouteMapper:
         self.run_button.grid(row=5, pady=10, columnspan=2)
 
     def choose_data(self, index):
-        self.data_files[index] = pathlib.Path(
-            askopenfilename(title="Choose the data file", filetypes=[("", ".SHX .xls .xlsx")]))
+        self.data_files[index] = askopenfilename(title="Choose the data file", filetypes=[("", ".SHX .xls .xlsx")])
         if index == 0:
             self.strategic_data.config(fg="green")
         else:
