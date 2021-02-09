@@ -3,7 +3,6 @@ from tkinter.filedialog import askopenfilename
 from tkinter import messagebox, filedialog
 
 from saturn_routes.run import run_analysis
-import pathlib
 
 root = tk.Tk()
 root.title("Strategic route mapper")

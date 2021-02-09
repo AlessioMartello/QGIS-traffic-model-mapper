@@ -46,7 +46,7 @@ def qgis_json_format(LINK_INPUT, LINK_OUTPUT, FAIL_OUTPUT, unique_codes, routes)
             continue
         route = {}
         route["PARAMETERS"] = {}
-        route["PARAMETERS"]["INPUT"] = LINK_INPUT
+        route["PARAMETERS"]["INPUT"] = f"'{LINK_INPUT}'"
         route["PARAMETERS"]["EXPRESSION"] = "' \\\"ID\\\"  = " + " or \\\"ID\\\"  = ".join(
             list(map(str, routes[i]))) + "\\n'"
         route["OUTPUTS"] = {}
@@ -56,7 +56,7 @@ def qgis_json_format(LINK_INPUT, LINK_OUTPUT, FAIL_OUTPUT, unique_codes, routes)
     return qgis_route_list
 
 
-def export_to_json(filename, data):
-    file = f"{pathlib.Path.cwd()}/{filename}.json"
+def export_to_json(filename, location, data):
+    file = f"{pathlib.Path(location).parents[0]}/{filename}.json"
     with open(file, "w") as f:
         json.dump(data, f)
