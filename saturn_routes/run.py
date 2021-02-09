@@ -1,7 +1,7 @@
 from saturn_routes import methods
 
 
-def run_analysis(strategic_data_file, link_input, link_output, fail_output, rounding=False):
+def run_analysis(strategic_data_file, link_input, rounding=False):
     useful_sheet_list = list(filter(lambda x: "VisumPaths" in x, methods.load_data(strategic_data_file, None).keys()))
     for sheet in useful_sheet_list:
         strategic_raw_data = methods.load_data(strategic_data_file, sheet)
@@ -16,9 +16,7 @@ def run_analysis(strategic_data_file, link_input, link_output, fail_output, roun
         else:
             volumes = methods.df_to_list(volume_data["VOL(AP)"])
         unique_volume_codes = [f"{i}_{j}" for i, j in zip(unique_codes, volumes)]
-        formatted_results = methods.qgis_json_format(link_input, link_output, fail_output, unique_volume_codes, routes)
+        directories = methods.create_route_directory(link_input, sheet)
+        directories.insert(0, link_input)
+        formatted_results = methods.qgis_json_format(*directories, unique_volume_codes, routes)
         methods.export_to_json(sheet, link_input, formatted_results)
-
-#
-# run_analysis("C:/Users/Alessio/programming/Python/Visum_routes/HLN_FB_AM_Cordon_routing_info.xlsx", "test", "test",
-#              "test")

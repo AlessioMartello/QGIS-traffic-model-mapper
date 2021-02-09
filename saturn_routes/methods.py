@@ -31,6 +31,14 @@ def get_routes(links):
         nested_routes[nest_count].append(links[i])
     return nested_routes
 
+def create_route_directory(cwd, user_class):
+    directories= []
+    for i in [user_class, "Fail"]:
+        directory = pathlib.Path(cwd).parents[0] / i
+        directory.mkdir(exist_ok=True)
+        directories.append(directory)
+    return directories
+
 def qgis_json_format(LINK_INPUT, LINK_OUTPUT, FAIL_OUTPUT, unique_codes, routes):
 
     """Format the sequence of links to be a list of dictionaries accepted by qgis"""
