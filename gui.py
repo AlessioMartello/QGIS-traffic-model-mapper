@@ -21,7 +21,6 @@ class RouteMapper:
 
         self.intro = tk.Label(main, text="Select the files containing the strategic data, GIS data and then click run:",
                               fg=FOREGROUND_COLOUR, font=("", 15, "bold")).grid(row=0, columnspan=2, padx=10,pady=10)
-
         self.strategic_data = tk.Button(main, text="Choose strategic data file", command=lambda: self.choose_data(0),
                                         bg=BACKGROUND_COLOUR,
                                         fg=FOREGROUND_COLOUR, highlightcolor=FOREGROUND_COLOUR, font=("", 15))
@@ -31,7 +30,6 @@ class RouteMapper:
         self.run_button = tk.Button(main, text="Run", command=self.run_analysis, bg=BACKGROUND_COLOUR,
                                 fg=FOREGROUND_COLOUR, highlightcolor=FOREGROUND_COLOUR, font=("", 15))
         self.rounding = tk.Checkbutton(main, text = "Perform rounding", variable = self.rounding_state, fg=FOREGROUND_COLOUR, font= ("", 15))
-
         self.strategic_data.grid(row= 1, column=0, pady=10, rowspan=2)
         self.link_input_btn.grid(row=1, column=1, pady=10)
         self.rounding.grid(row=4, pady=10, columnspan=2)

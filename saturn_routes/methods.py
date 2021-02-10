@@ -7,40 +7,44 @@ import pathlib
 
 def load_data(strategic_data_file, sheet_name):
     """ Reads Excel data into Pandas DataFrames"""
-    strategic_raw_data = pd.read_excel(strategic_data_file,dtype="object", header=4, sheet_name=sheet_name)
+    strategic_raw_data = pd.read_excel(strategic_data_file, dtype="object", header=4, sheet_name=sheet_name)
     return strategic_raw_data
+
 
 def df_to_list(df):
     lst = df.to_string(header=False, index=False).split()
     return lst
 
+
 def get_unique_codes(codes):
     # Create a list with unique code identifiers
-    unique_codes_no_duplicates= []
-    unique_codes = ["_".join(codes[i:i+3]) for i in range(0, len(codes), 3)]
+    unique_codes_no_duplicates = []
+    unique_codes = ["_".join(codes[i:i + 3]) for i in range(0, len(codes), 3)]
     [unique_codes_no_duplicates.append(i) for i in unique_codes if i not in unique_codes_no_duplicates]
     return unique_codes_no_duplicates
 
+
 def get_routes(links):
-    nested_routes, nest_count =[], -1
+    nested_routes, nest_count = [], -1
     for i in range(len(links)):
         if links[i] == 'NaN':
             nested_routes.append([])
-            nest_count +=1
+            nest_count += 1
             continue
         nested_routes[nest_count].append(links[i])
     return nested_routes
 
+
 def create_route_directory(cwd, user_class):
-    directories= []
+    directories = []
     for i in [user_class, "Fail"]:
         directory = pathlib.Path(cwd).parents[0] / i
         directory.mkdir(exist_ok=True)
-        directories.append(directory)
+        directories.append(directory.as_posix())
     return directories
 
-def qgis_json_format(LINK_INPUT, LINK_OUTPUT, FAIL_OUTPUT, unique_codes, routes):
 
+def qgis_json_format(LINK_INPUT, LINK_OUTPUT, FAIL_OUTPUT, unique_codes, routes):
     """Format the sequence of links to be a list of dictionaries accepted by qgis"""
 
     def define_filename(LINK_OUTPUT=LINK_OUTPUT, FAIL_OUTPUT=FAIL_OUTPUT):
